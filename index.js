@@ -40,3 +40,6 @@ mongoose
 
 //run server
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
+
+// routes
+app.use("/", require("./routes/index"));
