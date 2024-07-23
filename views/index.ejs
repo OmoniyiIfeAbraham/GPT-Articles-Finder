@@ -5,162 +5,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predefined Search Queries</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .ad-area {
-            background-color: #fff;
-            padding: 20px;
-            margin: 10px 0;
-            width: 80%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .ad-item {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .ad-item-title {
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        .app-area {
-            display: flex;
-            width: 80%;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .left,
-        .middle,
-        .right {
-            padding: 20px;
-        }
-
-        .left {
-            flex: 2;
-            border-right: 1px solid #ddd;
-        }
-
-        .middle {
-            flex: 1;
-            border-right: 1px solid #ddd;
-        }
-
-        .right {
-            flex: 1;
-        }
-
-        .results {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .result-item {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .result-item h3 {
-            margin: 0;
-        }
-
-        .result-item p {
-            margin: 5px 0 0;
-        }
-
-        .instructions,
-        .timer {
-            margin-bottom: 20px;
-        }
-
-        .search-controls {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .search-controls select,
-        .search-controls button {
-            margin-bottom: 10px;
-        }
-
-        .preset-buttons button {
-            display: block;
-            width: 100%;
-            margin-bottom: 5px;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .preset-buttons button:hover {
-            background-color: #0056b3;
-        }
-
-        #copy-urls {
-            background-color: #28a745;
-        }
-
-        #copy-urls:hover {
-            background-color: #218838;
-        }
-    </style>
+    <link rel="stylesheet" href="css/output.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="ad-area">
+<body class="bg-gray-100 flex flex-col items-center min-h-screen">
+
+    <header class="text-gray-600 body-font w-full">
+        <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+            <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
+                    viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span class="ml-3 text-xl">ArticleFinder</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Ad Area Top -->
+    <div class="ad-area w-11/12 bg-white shadow p-4 my-2 max-h-1/3 overflow-y-auto">
         <% adLists.adList1.forEach(ad=> { %>
-            <div class="ad-item">
-                <div class="ad-item-title">Ad Title 1:</div>
-                <div class="ad-item-content">
-                    <%= ad %>
-                </div>
+            <div class="mb-2 text-blue-600 font-semibold">
+                <%= ad %>
             </div>
             <% }) %>
     </div>
 
-    <div class="app-area">
-        <div class="left">
+    <!-- App Area -->
+    <div class="app-area w-11/12 bg-white shadow flex flex-grow my-2 max-h-screen">
+        <!-- Left Section -->
+        <div class="left w-2/5 p-4 border-r overflow-y-auto">
             <div id="results" class="results"></div>
         </div>
 
-        <div class="middle">
-            <div class="ad-area">
+        <!-- Middle Section -->
+        <div class="middle w-1/5 p-4 border-r">
+            <div class="ad-area bg-white shadow p-4 my-1 max-h-72 overflow-y-auto w-full">
                 <% adLists.adList3.forEach(ad=> { %>
-                    <div class="ad-item">
-                        <div class="ad-item-title">Ad Title 3:</div>
-                        <div class="ad-item-content">
-                            <%= ad %>
-                        </div>
+                    <div class="mb-2 text-blue-600 font-semibold">
+                        <%= ad %>
                     </div>
                     <% }) %>
             </div>
-            <div class="instructions">Instructions</div>
-            <div class="timer">Countdown Timer</div>
+            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons by the left to
+                generate results.</div>
+            <div class="timer text-gray-700">Countdown Timer</div>
         </div>
 
-        <div class="right">
-            <div class="search-controls">
-                <select id="site-select">
+        <!-- Right Section -->
+        <div class="right w-2/5 p-4 flex flex-col">
+            <div class="search-controls flex flex-col space-y-2">
+                <select id="site-select" class="p-2 border rounded">
                     <option value="">Select a site</option>
                     <% sites.forEach(site=> { %>
                         <option value="<%= site %>">
@@ -168,25 +65,24 @@
                         </option>
                         <% }) %>
                 </select>
-                <div class="preset-buttons">
+                <div class="preset-buttons flex flex-col space-y-2 max-h-96 overflow-y-auto">
                     <% searchPresets.forEach(preset=> { %>
-                        <button class="preset-button" data-preset="<%= preset %>">
+                        <button class="preset-button p-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                            data-preset="<%= preset %>">
                             <%= preset %>
                         </button>
                         <% }) %>
                 </div>
-                <button id="copy-urls">Copy URLs</button>
+                <button id="copy-urls" class="p-2 bg-green-500 text-white rounded hover:bg-green-700">Copy URLs</button>
             </div>
         </div>
     </div>
 
-    <div class="ad-area">
+    <!-- Ad Area Bottom -->
+    <div class="ad-area w-11/12 bg-white shadow p-4 my-2 max-h-1/3 overflow-y-auto">
         <% adLists.adList2.forEach(ad=> { %>
-            <div class="ad-item">
-                <div class="ad-item-title">Ad Title 2:</div>
-                <div class="ad-item-content">
-                    <%= ad %>
-                </div>
+            <div class="mb-2 text-blue-600 font-semibold">
+                <%= ad %>
             </div>
             <% }) %>
     </div>
@@ -215,10 +111,10 @@
                     if (data.length > 0) {
                         data.forEach(item => {
                             const resultItem = document.createElement('div');
-                            resultItem.classList.add('result-item');
+                            resultItem.classList.add('result-item', 'mb-4', 'p-2', 'border-b');
                             resultItem.innerHTML = `
-                            <h3>${item.title}</h3>
-                            <p>${item.snippet}</p>
+                            <h3 class="text-lg font-semibold">${item.title}</h3>
+                            <p class="text-gray-700">${item.snippet}</p>
                         `;
                             resultsDiv.appendChild(resultItem);
                         });

@@ -21,14 +21,23 @@ const adLists = {
     "Enhance your career with our online courses. From tech to arts, gain new skills at your own pace. Join a community of learners and access expert instructors. Sign up today and invest in your future. Explore our course catalog now!",
     "Let us create your perfect getaway with tailor-made travel packages. From beaches to mountains, find your ideal destination. Enjoy personalized service and great deals. Contact us now to start planning your unforgettable vacation!",
   ],
-  adList3: ["Ad 3.1", "Ad 3.2"],
+  adList3: [
+    "Discover our range of skincare and beauty products for a radiant glow. Shop top brands and enjoy exclusive offers. Transform your beauty routine with our curated selection. Visit us today and shine with confidence!",
+    "Upgrade your mobile plan with unlimited data and calls. Enjoy fast, reliable service and great deals. Stay connected with family and friends. Explore our plans and choose the best fit for you. Sign up today for more!",
+    "Protect your home with our advanced security systems. From cameras to alarms, find reliable solutions to keep your loved ones safe. Get a free consultation and enhance your peace of mind. Secure your home with us!",
+    "Gear up for your next adventure with our high-quality outdoor equipment. From tents to backpacks, find everything you need for your journey. Shop now and explore our range of products. Prepare for adventure today!",
+    "Boost your wellness with our range of vitamins and supplements. Shop top brands and enjoy exclusive discounts. Enhance your health with our high-quality products. Visit us today and take the first step towards better well-being!",
+  ],
 };
 
 const sites = ["facebook.com", "instagram.com", "twitter.com"];
 
 const searchPresets = [
-  "intitle:'In today's fast-paced world' intext:revolutionize intext:innovative",
-  "intitle:'Discover the best' intext:solutions intext:technology",
+  "Russia and Ukraine War",
+  "Climate Change Impact",
+  "Artificial Intelligence Developments",
+  "Global Economic Trends",
+  "Space Exploration Missions",
 ];
 
 router.get("/", (req, res) => {

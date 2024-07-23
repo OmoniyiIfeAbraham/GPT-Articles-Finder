@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ad-area {
+  background-color: #fff;
+  padding: 20px;
+  margin: 10px 0;
+  width: 80%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 30%;
+  overflow: hidden;
+}
+
+.ad-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #333;
+}
+
+.ad-item-title {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.app-area {
+  display: flex;
+  width: 80%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.left,
+.middle,
+.right {
+  padding: 20px;
+}
+
+.left {
+  flex: 2;
+  border-right: 1px solid #ddd;
+}
+
+.middle {
+  flex: 1;
+  border-right: 1px solid #ddd;
+}
+
+.right {
+  flex: 1;
+}
+
+.results {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.result-item {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.result-item h3 {
+  margin: 0;
+}
+
+.result-item p {
+  margin: 5px 0 0;
+}
+
+.instructions,
+.timer {
+  margin-bottom: 20px;
+}
+
+.search-controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-controls select,
+.search-controls button {
+  margin-bottom: 10px;
+}
+
+.preset-buttons button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.preset-buttons button:hover {
+  background-color: #0056b3;
+}
+
+#copy-urls {
+  background-color: #28a745;
+}
+
+#copy-urls:hover {
+  background-color: #218838;
+}
