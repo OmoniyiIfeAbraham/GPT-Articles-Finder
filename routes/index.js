@@ -61,9 +61,20 @@ router.post("/api/search", async (req, res) => {
       }
     );
 
+    req.session.lastSearch = Date.now();
     res.json(response.data.items.slice(0, 10));
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch search results" });
+  }
+});
+
+router.get("/api/check-session", (req, res) => {
+  if (req.session.lastSearch) {
+    const timeElapsed = Date.now() - req.session.lastSearch;
+    const timeLeft = 30000 - timeElapsed;
+    res.json({ timeLeft: timeLeft > 0 ? timeLeft : 0 });
+  } else {
+    res.json({ timeLeft: 0 });
   }
 });
 

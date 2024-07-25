@@ -10,7 +10,6 @@
 </head>
 
 <body class="bg-gray-100 flex flex-col items-center min-h-screen">
-
     <header class="text-gray-600 body-font w-full">
         <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
             <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
@@ -49,9 +48,9 @@
                     </div>
                     <% }) %>
             </div>
-            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons by the right to
+            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons on the right to
                 generate results.</div>
-            <div class="timer text-gray-700">Countdown Timer</div>
+            <div id="timer" class="timer text-gray-700">Countdown Timer</div>
         </div>
 
         <!-- Right Section -->
@@ -73,8 +72,6 @@
                         </button>
                         <% }) %>
                 </div>
-                <!-- <button id="copy-urls" class="p-2 bg-green-500 text-white rounded hover:bg-green-700">Copy All
-                    URLs</button> -->
             </div>
         </div>
     </div>
@@ -139,48 +136,88 @@
                             const resultItem = document.createElement('div');
                             resultItem.classList.add('result-item', 'mb-4', 'p-2', 'border-b');
                             resultItem.innerHTML = `
-                                <h3 class="text-lg font-semibold"><a href='${item.link}' target='_blank'>${item.title}</a></h3>
-                                <p class="text-gray-700">${item.snippet}</p>
-                                <button class="copy-url-button p-1 bg-green-500 text-white rounded hover:bg-green-700" data-url='${item.link}'>Copy URL</button>
-                            `;
+                            <h3 class="text-lg font-semibold"><a href='${item.link}' target='_blank'>${item.title}</a></h3>
+                            <p class="text-gray-700">${item.snippet}</p>
+                            <button class="copy-url-button p-1 bg-green-500 text-white rounded hover:bg-green-700" data-url='${item.link}'>Copy URL</button>
+                        `;
                             resultsDiv.appendChild(resultItem);
                         });
-                        addCopyButtonListeners();
                     } else {
                         resultsDiv.innerHTML = '<p>No results found.</p>';
                     }
-                })
-                .catch(error => {
-                    console.error('Error fetching search results:', error);
-                });
-        }
 
-        function addCopyButtonListeners() {
-            document.querySelectorAll('.copy-url-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const url = button.getAttribute('data-url');
-                    navigator.clipboard.writeText(url).then(() => {
-                        showModal();
+                    document.querySelectorAll('.copy-url-button').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const url = button.getAttribute('data-url');
+                            copyToClipboard(url);
+                        });
                     });
+
+                    // Start session timer on successful search
+                    startSessionTimer();
                 });
-            });
         }
 
-        function showModal() {
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            // Show modal
             const modal = document.getElementById('modal');
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.add('hidden');
-            }, 2000);
+            }, 1000);
         }
 
-        document.getElementById('copy-urls').addEventListener('click', () => {
-            const results = document.querySelectorAll('.result-item h3 a');
-            const urls = Array.from(results).map(result => result.href).join('\n');
-            navigator.clipboard.writeText(urls).then(() => {
-                showModal();
+        let timerIntervalId;
+
+        function startSessionTimer() {
+            clearInterval(timerIntervalId); // Clear any existing timer
+            const timerDiv = document.getElementById('timer');
+            let timeLeft = 30; // 30 seconds
+
+            timerIntervalId = setInterval(() => {
+                timeLeft--;
+                timerDiv.innerHTML = `Time left: ${timeLeft} seconds`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerIntervalId);
+                    disableControls();
+                    timerDiv.innerHTML = `Session expired. Please wait to start a new session.`;
+
+                    // Automatically start a new session after 5 seconds
+                    setTimeout(() => {
+                        enableControls();
+                    }, 5000);
+                }
+            }, 1000);
+        }
+
+        function disableControls() {
+            siteSelect.disabled = true;
+            presetButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('bg-blue-300', 'cursor-not-allowed');
+                button.classList.remove('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
             });
-        });
+        }
+
+        function enableControls() {
+            siteSelect.disabled = false;
+            const site = siteSelect.value;
+            presetButtons.forEach(button => {
+                if (site) {
+                    button.classList.remove('bg-blue-300', 'cursor-not-allowed');
+                    button.classList.add('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
+                    button.disabled = false;
+                }
+            });
+        }
     </script>
 </body>
 
