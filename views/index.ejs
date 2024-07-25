@@ -27,7 +27,7 @@
     <!-- Ad Area Top -->
     <div class="ad-area w-11/12 bg-white shadow p-4 my-2 max-h-1/3 overflow-y-auto">
         <% adLists.adList1.forEach(ad=> { %>
-            <div class="mb-2 text-blue-600 font-semibold">
+            <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                 <%= ad %>
             </div>
             <% }) %>
@@ -44,12 +44,12 @@
         <div class="middle w-1/5 p-4 border-r">
             <div class="ad-area bg-white shadow p-4 my-1 max-h-72 overflow-y-auto w-full">
                 <% adLists.adList3.forEach(ad=> { %>
-                    <div class="mb-2 text-blue-600 font-semibold">
+                    <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                         <%= ad %>
                     </div>
                     <% }) %>
             </div>
-            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons by the left to
+            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons by the right to
                 generate results.</div>
             <div class="timer text-gray-700">Countdown Timer</div>
         </div>
@@ -67,13 +67,14 @@
                 </select>
                 <div class="preset-buttons flex flex-col space-y-2 max-h-96 overflow-y-auto">
                     <% searchPresets.forEach(preset=> { %>
-                        <button class="preset-button p-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                            data-preset="<%= preset %>">
+                        <button class="preset-button p-2 bg-blue-300 text-white rounded cursor-not-allowed"
+                            data-preset="<%= preset %>" disabled>
                             <%= preset %>
                         </button>
                         <% }) %>
                 </div>
-                <button id="copy-urls" class="p-2 bg-green-500 text-white rounded hover:bg-green-700">Copy URLs</button>
+                <!-- <button id="copy-urls" class="p-2 bg-green-500 text-white rounded hover:bg-green-700">Copy All
+                    URLs</button> -->
             </div>
         </div>
     </div>
@@ -81,13 +82,38 @@
     <!-- Ad Area Bottom -->
     <div class="ad-area w-11/12 bg-white shadow p-4 my-2 max-h-1/3 overflow-y-auto">
         <% adLists.adList2.forEach(ad=> { %>
-            <div class="mb-2 text-blue-600 font-semibold">
+            <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                 <%= ad %>
             </div>
             <% }) %>
     </div>
 
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded shadow-md text-center">
+            <p class="text-lg font-semibold">Copied to Clipboard</p>
+        </div>
+    </div>
+
     <script>
+        const siteSelect = document.getElementById('site-select');
+        const presetButtons = document.querySelectorAll('.preset-button');
+
+        siteSelect.addEventListener('change', () => {
+            const site = siteSelect.value;
+            presetButtons.forEach(button => {
+                if (site) {
+                    button.classList.remove('bg-blue-300', 'cursor-not-allowed');
+                    button.classList.add('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
+                    button.disabled = false;
+                } else {
+                    button.classList.add('bg-blue-300', 'cursor-not-allowed');
+                    button.classList.remove('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
+                    button.disabled = true;
+                }
+            });
+        });
+
         document.querySelectorAll('.preset-button').forEach(button => {
             button.addEventListener('click', () => {
                 const preset = button.getAttribute('data-preset');
@@ -113,11 +139,13 @@
                             const resultItem = document.createElement('div');
                             resultItem.classList.add('result-item', 'mb-4', 'p-2', 'border-b');
                             resultItem.innerHTML = `
-                            <h3 class="text-lg font-semibold">${item.title}</h3>
-                            <p class="text-gray-700">${item.snippet}</p>
-                        `;
+                                <h3 class="text-lg font-semibold"><a href='${item.link}' target='_blank'>${item.title}</a></h3>
+                                <p class="text-gray-700">${item.snippet}</p>
+                                <button class="copy-url-button p-1 bg-green-500 text-white rounded hover:bg-green-700" data-url='${item.link}'>Copy URL</button>
+                            `;
                             resultsDiv.appendChild(resultItem);
                         });
+                        addCopyButtonListeners();
                     } else {
                         resultsDiv.innerHTML = '<p>No results found.</p>';
                     }
@@ -127,10 +155,31 @@
                 });
         }
 
+        function addCopyButtonListeners() {
+            document.querySelectorAll('.copy-url-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const url = button.getAttribute('data-url');
+                    navigator.clipboard.writeText(url).then(() => {
+                        showModal();
+                    });
+                });
+            });
+        }
+
+        function showModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 2000);
+        }
+
         document.getElementById('copy-urls').addEventListener('click', () => {
             const results = document.querySelectorAll('.result-item h3 a');
             const urls = Array.from(results).map(result => result.href).join('\n');
-            navigator.clipboard.writeText(urls);
+            navigator.clipboard.writeText(urls).then(() => {
+                showModal();
+            });
         });
     </script>
 </body>
