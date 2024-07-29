@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predefined Search Queries</title>
-    <link rel="stylesheet" href="css/output.css">
+    <title>GPT Lead Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
@@ -13,12 +12,7 @@
     <header class="text-gray-600 body-font w-full">
         <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
             <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
-                    stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
-                    viewBox="0 0 24 24">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
-                <span class="ml-3 text-xl">ArticleFinder</span>
+                <span class="ml-3 text-xl">GPT Lead Generator</span>
             </a>
         </div>
     </header>
@@ -29,7 +23,7 @@
             <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                 <%= ad %>
             </div>
-            <% }) %>
+        <% }) %>
     </div>
 
     <!-- App Area -->
@@ -46,15 +40,14 @@
                     <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                         <%= ad %>
                     </div>
-                    <% }) %>
+                <% }) %>
             </div>
-            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons on the right to
-                generate results.</div>
+            <div class="instructions my-4 text-gray-700 max-h-48 overflow-y-auto">Click the buttons on the right to generate results.</div>
             <div id="timer" class="timer text-gray-700">Countdown Timer</div>
         </div>
 
         <!-- Right Section -->
-        <div class="right w-2/5 p-4 flex flex-col">
+        <div class="right w-2/5 p-4 flex flex-col relative">
             <div class="search-controls flex flex-col space-y-2">
                 <select id="site-select" class="p-2 border rounded">
                     <option value="">Select a site</option>
@@ -62,15 +55,18 @@
                         <option value="<%= site %>">
                             <%= site %>
                         </option>
-                        <% }) %>
+                    <% }) %>
                 </select>
-                <div class="preset-buttons flex flex-col space-y-2 max-h-96 overflow-y-auto">
-                    <% searchPresets.forEach(preset=> { %>
-                        <button class="preset-button p-2 bg-blue-300 text-white rounded cursor-not-allowed"
-                            data-preset="<%= preset %>" disabled>
-                            <%= preset %>
-                        </button>
+                <div class="relative preset-buttons-container">
+                    <div id="overlay" class="absolute inset-0 bg-gray-300 opacity-30"></div>
+                    <div class="preset-buttons flex flex-col space-y-2 max-h-96 overflow-y-auto">
+                        <% searchPresets.forEach(preset=> { %>
+                            <button class="preset-button p-2 bg-blue-300 text-white rounded cursor-not-allowed"
+                                data-preset="<%= preset %>" disabled>
+                                <%= preset %>
+                            </button>
                         <% }) %>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,7 +78,7 @@
             <div class="mb-2 text-blue-600 font-semibold bg-green-100">
                 <%= ad %>
             </div>
-            <% }) %>
+        <% }) %>
     </div>
 
     <!-- Modal -->
@@ -95,27 +91,49 @@
     <script>
         const siteSelect = document.getElementById('site-select');
         const presetButtons = document.querySelectorAll('.preset-button');
+        const overlay = document.getElementById('overlay');
 
-        siteSelect.addEventListener('change', () => {
-            const site = siteSelect.value;
-            presetButtons.forEach(button => {
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/check-session')
+                .then(response => response.json())
+                .then(data => {
+                    let timeLeft = data.timeLeft;
+                    if (timeLeft > 0) {
+                        hideOverlay();
+                        let val = Math.round(timeLeft / 1000) // Convert milliseconds to seconds
+                        startSessionTimer(val);
+                    } else {
+                        showOverlay();
+                    }
+                });
+
+            siteSelect.addEventListener('change', () => {
+                const site = siteSelect.value;
                 if (site) {
-                    button.classList.remove('bg-blue-300', 'cursor-not-allowed');
-                    button.classList.add('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
-                    button.disabled = false;
+                    hideOverlay();
                 } else {
-                    button.classList.add('bg-blue-300', 'cursor-not-allowed');
-                    button.classList.remove('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
-                    button.disabled = true;
+                    showOverlay();
                 }
-            });
-        });
 
-        document.querySelectorAll('.preset-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const preset = button.getAttribute('data-preset');
-                const site = document.getElementById('site-select').value;
-                searchGoogle(site, preset);
+                presetButtons.forEach(button => {
+                    if (site) {
+                        button.classList.remove('bg-blue-300', 'cursor-not-allowed');
+                        button.classList.add('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
+                        button.disabled = false;
+                    } else {
+                        button.classList.add('bg-blue-300', 'cursor-not-allowed');
+                        button.classList.remove('bg-blue-500', 'hover:bg-blue-700', 'cursor-pointer');
+                        button.disabled = true;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.preset-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const preset = button.getAttribute('data-preset');
+                    const site = siteSelect.value;
+                    searchGoogle(site, preset);
+                });
             });
         });
 
@@ -136,10 +154,10 @@
                             const resultItem = document.createElement('div');
                             resultItem.classList.add('result-item', 'mb-4', 'p-2', 'border-b');
                             resultItem.innerHTML = `
-                            <h3 class="text-lg font-semibold"><a href='${item.link}' target='_blank'>${item.title}</a></h3>
-                            <p class="text-gray-700">${item.snippet}</p>
-                            <button class="copy-url-button p-1 bg-green-500 text-white rounded hover:bg-green-700" data-url='${item.link}'>Copy URL</button>
-                        `;
+                                <h3 class="text-lg font-semibold"><a href='${item.link}' target='_blank'>${item.title}</a></h3>
+                                <p class="text-gray-700">${item.snippet}</p>
+                                <button class="copy-url-button p-1 bg-green-500 text-white rounded hover:bg-green-700" data-url='${item.link}'>Copy URL</button>
+                            `;
                             resultsDiv.appendChild(resultItem);
                         });
                     } else {
@@ -154,6 +172,7 @@
                     });
 
                     // Start session timer on successful search
+                    showOverlay();
                     startSessionTimer();
                 });
         }
@@ -176,10 +195,13 @@
 
         let timerIntervalId;
 
-        function startSessionTimer() {
+        function startSessionTimer(initialTimeLeft) {
             clearInterval(timerIntervalId); // Clear any existing timer
             const timerDiv = document.getElementById('timer');
-            let timeLeft = 30; // 30 seconds
+            let timeLeft = initialTimeLeft || 30; // Default to 30 seconds if not set
+
+            // remove the select dropdown
+            siteSelect.classList.add('hidden');
 
             timerIntervalId = setInterval(() => {
                 timeLeft--;
@@ -193,7 +215,10 @@
                     // Automatically start a new session after 5 seconds
                     setTimeout(() => {
                         enableControls();
-                    }, 5000);
+                        hideOverlay();
+                        timerDiv.innerHTML = 'Countdown Timer';
+                        siteSelect.classList.remove('hidden');
+                    }, 2000);
                 }
             }, 1000);
         }
@@ -218,6 +243,17 @@
                 }
             });
         }
+
+        function showOverlay() {
+            overlay.classList.remove('hidden');
+        }
+
+        function hideOverlay() {
+            overlay.classList.add('hidden');
+        }
+
+        // Initially show the overlay
+        showOverlay();
     </script>
 </body>
 

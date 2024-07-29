@@ -1,50 +1,36 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 const apiKey = process.env.googleCloudConsoleApiKey;
 const cx = process.env.customSearchEngineIdcx;
 
-// Mock data
-const adLists = {
-  adList1: [
-    "Enhance your digital footprint with our expert marketing solutions. From SEO to social media, we tailor strategies to elevate your brand. Contact us today to maximize your reach and visibility. Transform your online presence and outshine the competition!",
-    "Discover unbeatable deals on the latest trends. From fashion to tech, save big on top brands. Sign up for our newsletter for early access to sales and personalized offers. Shop now and enjoy limited-time discounts. Don't miss out!",
-    "Elevate your home with our stylish decor collection. From modern to rustic, find high-quality pieces that reflect your taste. Shop our curated selection and get inspired. Make every corner of your home a statement. Visit us today!",
-    "Stay ahead with the latest gadgets at unbeatable prices. From smartphones to smart home devices, find top tech from trusted brands. Enjoy special offers and expert advice. Shop now and upgrade your digital life. Explore our collection today!",
-    "Join our fitness program for personalized training plans. Whether you want to lose weight or build muscle, our experts guide you. Enjoy a variety of classes and state-of-the-art equipment. Start your journey today and transform your health!",
-  ],
-  adList2: [
-    "Refresh your style with our latest clothing collection. From casual wear to evening outfits, find fashionable and affordable pieces. Shop now for exclusive discounts and free shipping. Express your unique style with our trendy selection!",
-    "Indulge in our luxurious spa treatments and escape the daily grind. From massages to facials, enjoy top-notch care in a serene setting. Book your appointment today and rejuvenate your mind and body. Treat yourself to ultimate relaxation!",
-    "Savor premium gourmet foods from around the world. From cheeses to chocolates, indulge in top-quality ingredients. Shop online and enjoy convenient home delivery. Elevate your culinary experience with our exquisite selection. Order now!",
-    "Enhance your career with our online courses. From tech to arts, gain new skills at your own pace. Join a community of learners and access expert instructors. Sign up today and invest in your future. Explore our course catalog now!",
-    "Let us create your perfect getaway with tailor-made travel packages. From beaches to mountains, find your ideal destination. Enjoy personalized service and great deals. Contact us now to start planning your unforgettable vacation!",
-  ],
-  adList3: [
-    "Discover our range of skincare and beauty products for a radiant glow. Shop top brands and enjoy exclusive offers. Transform your beauty routine with our curated selection. Visit us today and shine with confidence!",
-    "Upgrade your mobile plan with unlimited data and calls. Enjoy fast, reliable service and great deals. Stay connected with family and friends. Explore our plans and choose the best fit for you. Sign up today for more!",
-    "Protect your home with our advanced security systems. From cameras to alarms, find reliable solutions to keep your loved ones safe. Get a free consultation and enhance your peace of mind. Secure your home with us!",
-    "Gear up for your next adventure with our high-quality outdoor equipment. From tents to backpacks, find everything you need for your journey. Shop now and explore our range of products. Prepare for adventure today!",
-    "Boost your wellness with our range of vitamins and supplements. Shop top brands and enjoy exclusive discounts. Enhance your health with our high-quality products. Visit us today and take the first step towards better well-being!",
-  ],
+const loadFile = (filename) => {
+  const filePath = path.join(__dirname, '../DB', filename);
+  return fs.readFileSync(filePath, 'utf-8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
 };
 
-const sites = ["facebook.com", "instagram.com", "twitter.com"];
-
-const searchPresets = [
-  "Russia and Ukraine War",
-  "Climate Change Impact",
-  "Artificial Intelligence Developments",
-  "Global Economic Trends",
-  "Space Exploration Missions",
-];
+const loadAdLists = (filename) => {
+  const filePath = path.join(__dirname, '../DB', filename);
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const adLists = {};
+  const sections = content.split(/adList\d:/).filter(section => section.trim().length > 0);
+  sections.forEach((section, index) => {
+    adLists[`adList${index + 1}`] = section.split(';').map(ad => ad.trim()).filter(ad => ad.length > 0);
+  });
+  return adLists;
+};
 
 router.get("/", (req, res) => {
+  // Load data from files
+  const adLists = loadAdLists('adLists.txt');
+  const sites = loadFile('sites.txt');
+  const searchPresets = loadFile('searchPresets.txt');
   res.render("index", { adLists, sites, searchPresets });
 });
 
-// Route to handle search
 router.post("/api/search", async (req, res) => {
   const { site, preset } = req.body;
   const query = `site:${site} ${preset}`;
@@ -71,7 +57,7 @@ router.post("/api/search", async (req, res) => {
 router.get("/api/check-session", (req, res) => {
   if (req.session.lastSearch) {
     const timeElapsed = Date.now() - req.session.lastSearch;
-    const timeLeft = 30000 - timeElapsed;
+    const timeLeft = (30000 - timeElapsed);
     res.json({ timeLeft: timeLeft > 0 ? timeLeft : 0 });
   } else {
     res.json({ timeLeft: 0 });
